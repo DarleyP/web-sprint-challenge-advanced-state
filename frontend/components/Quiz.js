@@ -3,21 +3,38 @@ import { selectAnswer } from '../state/action-creators';
 import { connect } from 'react-redux';
 import { fetchQuiz, postAnswer } from '../state/action-creators';
 import { useDispatch } from 'react-redux';
-
 //use use effect, ! check 
 
 const Quiz = (props) =>  {
- const {quiz} = props;
- const dispatch = useDispatch();
+ const {quiz, fetchQuiz, postAnswer, selectAnswer} = props;
+ 
+ console.log('quiz', {quiz})
 
-
-useEffect(()=> {
-  dispatch(fetchQuiz())
-}, [dispatch])
-
-  const handleSelected = () => {
-
+ useEffect(()=> {
+  if (!quiz) {
+    fetchQuiz();
   }
+ },[]);
+
+ 
+ 
+
+  const handleSelected1 = (e) => {
+   e.preventDefault()
+   
+   console.log(quiz.answers[0].answer_id)
+
+    selectAnswer(quiz.answers[0].answer_id)
+  };
+
+
+  const handleSelected2 = (e) => {
+    e.preventDefault()
+    
+     console.log()
+   
+     
+   };
 
 
   return (
@@ -26,20 +43,19 @@ useEffect(()=> {
         // quiz already in state? Let's use that, otherwise render "Loading next quiz..."
         quiz ? (
           <>
-            <h2>Question: </h2>
+            <h2>{quiz.question}</h2>
 
             <div id="quizAnswers">
               <div className="answer">
-               answer 
-                <button onClick={handleSelected}>
-                  SELECT
+              {quiz.answers[0].text}
+                <button onClick={handleSelected1}>
+                  {}
                 </button>
               </div>
 
-              <div className="answer seleceted " >
-                Answer
-                <button onClick={handleSelected}>
-                  Select
+              <div className="answer" >
+              {quiz.answers[1].text}
+                <button onClick={handleSelected2}>
                 </button>
               </div>
             </div>
@@ -55,11 +71,11 @@ useEffect(()=> {
 
 const mapStateToProps = (state) => {
   return {
-    quiz: state.quiz,
-    answer_id: state.answer_id,
-
+    quiz: state.quiz
   }
 }
 
 
 export default connect(mapStateToProps,{selectAnswer,fetchQuiz,postAnswer})(Quiz)
+
+
