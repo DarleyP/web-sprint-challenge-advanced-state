@@ -22,24 +22,25 @@ export function moveCounterClockwise() {
 export function selectAnswer(answer_id) {
   return {
     type: SET_SELECTED_ANSWER,
-    paylaod: answer_id
+    payload: answer_id
   }
 }
 
-export function setMessage() {
-  return { type: SET_INFO_MESSAGE, payload: payload }
+export function setMessage(infoMessage) {
+  return { type: SET_INFO_MESSAGE, payload: infoMessage }
 }
 
 export function setQuiz(quiz) {
   return { type: SET_QUIZ_INTO_STATE,  payload: quiz }
 }
 
-export function inputChange() {
-
+export function inputChange(fieldName, value) {
+return { type: INPUT_CHANGE, payload: {fieldName, value}
+}
 }
 
 export function resetForm() {
-
+ return {type: RESET_FORM}
 }
 
 // ❗ Async action creators
@@ -60,19 +61,37 @@ export function fetchQuiz() {
 
   }
 }
-export function postAnswer() {
+export function postAnswer(quizId,answerId) {
   return function (dispatch) {
     // On successful POST:
     // - Dispatch an action to reset the selected answer state
     // - Dispatch an action to set the server message to state
     // - Dispatch the fetching of the next quiz
+    const payload = { quiz_id: quizId, answer_id: answerId }
+    axios.post('http://localhost:9000/api/quiz/answer', payload)
+      .then((res)=>{
+        dispatch(setMessage(res.data.message));
+        dispatch(selectAnswer(null))
+        dispatch(fetchQuiz())
+      })
+      .catch((err)=>
+      {console.log(err)})
   }
 }
-export function postQuiz() {
+export function postQuiz(payload) {
   return function (dispatch) {
     // On successful POST:
     // - Dispatch the correct message to the the appropriate state
     // - Dispatch the resetting of the form
+    axios.post(' http://localhost:9000/api/quiz/new', payload)
+      .then((res)=> {
+        dispatch(setMessage(`Congrats: "${res.data.question}" is a great question!`))
+        dispatch(resetForm())
+      })
+      .catch((err)=>{
+        dispatch(setMessage(err))
+      })
+      
   }
 }
 // ❗ On promise rejections, use log statements or breakpoints, and put an appropriate error message in state
